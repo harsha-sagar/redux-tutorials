@@ -1,5 +1,6 @@
 const redux = require('redux');
 const createStore = redux.createStore;
+const combineReducers = redux.combineReducers;
 
 const BUY_CAKE = 'BUY_CAKE';
 const BUY_ICECREAM = 'BUY_ICECREAM';
@@ -22,19 +23,29 @@ function buyIcecreamActionCreator() {
   return buyIcecreamAction;
 }
 
-const initialState = {
-  numberOfCakes: 10,
+const initialCakesState = {
+  numberOfCakes: 10
+};
+
+const initialIcecreamsState = {
   numberOfIcecreams: 20
 };
 
-const buyReducer = (state = initialState, action) => {
+const buyCakeReducer = (state = initialCakesState, action) => {
   switch(action.type) {
-    case BUY_CAKE:
+    case BUY_ICECREAM:
       return {
         ...state,
         numberOfCakes: state.numberOfCakes - 1        
       }
-    case BUY_ICECREAM:
+    default:
+      return state
+  }
+}
+
+const buyIcecreamReducer = (state = initialIcecreamsState, action) => {
+  switch(action.type) {
+    case BUY_CAKE:
       return {
         ...state,
         numberOfIcecreams: state.numberOfIcecreams - 1        
@@ -44,7 +55,12 @@ const buyReducer = (state = initialState, action) => {
   }
 }
 
-const applicationStore = createStore(buyReducer);
+const rootReducer = combineReducers({
+  cakes: buyCakeReducer,
+  iceCreams: buyIcecreamReducer
+})
+
+const applicationStore = createStore(rootReducer);
 
 console.log('initial state of the application: ', applicationStore.getState());
 
@@ -68,15 +84,14 @@ applicationStore.dispatch(buyIcecreamActionCreator());
 unsubscribe();
 
 /*
+running the code:
 
-Running the code, would give:
-
-initial state of the application:  { numberOfCakes: 10, numberOfIcecreams: 20 }
-update state of the application:  { numberOfCakes: 9, numberOfIcecreams: 20 }
-update state of the application:  { numberOfCakes: 8, numberOfIcecreams: 20 }
-update state of the application:  { numberOfCakes: 7, numberOfIcecreams: 20 }
-update state of the application:  { numberOfCakes: 7, numberOfIcecreams: 19 }
-update state of the application:  { numberOfCakes: 7, numberOfIcecreams: 18 }
-update state of the application:  { numberOfCakes: 7, numberOfIcecreams: 17 }
+initial state of the application:  { cakes: { numberOfCakes: 10 }, iceCreams: { numberOfIcecreams: 20 } }
+update state of the application:  { cakes: { numberOfCakes: 10 }, iceCreams: { numberOfIcecreams: 19 } }
+update state of the application:  { cakes: { numberOfCakes: 10 }, iceCreams: { numberOfIcecreams: 18 } }
+update state of the application:  { cakes: { numberOfCakes: 10 }, iceCreams: { numberOfIcecreams: 17 } }
+update state of the application:  { cakes: { numberOfCakes: 9 }, iceCreams: { numberOfIcecreams: 17 } }
+update state of the application:  { cakes: { numberOfCakes: 8 }, iceCreams: { numberOfIcecreams: 17 } }
+update state of the application:  { cakes: { numberOfCakes: 7 }, iceCreams: { numberOfIcecreams: 17 } }
 
 */
