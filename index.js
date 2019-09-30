@@ -33,7 +33,7 @@ const initialIcecreamsState = {
 
 const buyCakeReducer = (state = initialCakesState, action) => {
   switch(action.type) {
-    case BUY_ICECREAM:
+    case BUY_CAKE:
       return {
         ...state,
         numberOfCakes: state.numberOfCakes - 1        
@@ -45,7 +45,7 @@ const buyCakeReducer = (state = initialCakesState, action) => {
 
 const buyIcecreamReducer = (state = initialIcecreamsState, action) => {
   switch(action.type) {
-    case BUY_CAKE:
+    case BUY_ICECREAM:
       return {
         ...state,
         numberOfIcecreams: state.numberOfIcecreams - 1        
@@ -56,8 +56,8 @@ const buyIcecreamReducer = (state = initialIcecreamsState, action) => {
 }
 
 const rootReducer = combineReducers({
-  cakes: buyCakeReducer,
-  iceCreams: buyIcecreamReducer
+  cake: buyCakeReducer,
+  iceCream: buyIcecreamReducer
 })
 
 const applicationStore = createStore(rootReducer);
@@ -86,12 +86,17 @@ unsubscribe();
 /*
 running the code:
 
-initial state of the application:  { cakes: { numberOfCakes: 10 }, iceCreams: { numberOfIcecreams: 20 } }
-update state of the application:  { cakes: { numberOfCakes: 10 }, iceCreams: { numberOfIcecreams: 19 } }
-update state of the application:  { cakes: { numberOfCakes: 10 }, iceCreams: { numberOfIcecreams: 18 } }
-update state of the application:  { cakes: { numberOfCakes: 10 }, iceCreams: { numberOfIcecreams: 17 } }
-update state of the application:  { cakes: { numberOfCakes: 9 }, iceCreams: { numberOfIcecreams: 17 } }
-update state of the application:  { cakes: { numberOfCakes: 8 }, iceCreams: { numberOfIcecreams: 17 } }
-update state of the application:  { cakes: { numberOfCakes: 7 }, iceCreams: { numberOfIcecreams: 17 } }
+initial state of the application:  { cake: { numberOfCakes: 10 }, iceCream: { numberOfIcecreams: 20 } }
+update state of the application:  { cake: { numberOfCakes: 9 }, iceCream: { numberOfIcecreams: 20 } }
+update state of the application:  { cake: { numberOfCakes: 8 }, iceCream: { numberOfIcecreams: 20 } }
+update state of the application:  { cake: { numberOfCakes: 7 }, iceCream: { numberOfIcecreams: 20 } }
+update state of the application:  { cake: { numberOfCakes: 7 }, iceCream: { numberOfIcecreams: 19 } }
+update state of the application:  { cake: { numberOfCakes: 7 }, iceCream: { numberOfIcecreams: 18 } }
+update state of the application:  { cake: { numberOfCakes: 7 }, iceCream: { numberOfIcecreams: 17 } }
+
+- cake, iceCream describes global state objects
+- conventions for keys 'cake' & 'iceCream' is just as defined on combinedReducer.
+
+- Both reducers receives both actions cakeAction, iceCreamAction. Concerned reducer reacts to the action & other reducer ignores it.
 
 */
