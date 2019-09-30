@@ -2,87 +2,81 @@ const redux = require('redux');
 const createStore = redux.createStore;
 
 const BUY_CAKE = 'BUY_CAKE';
+const BUY_ICECREAM = 'BUY_ICECREAM';
 
-const bugCakeAction = {
+const buyCakeAction = {
   type: BUY_CAKE,
   info: 'first redux action'
 }
-/*
-  An action is a plain javascript object.
-  It has a property 'type' describes type of action.
 
-  conventions as per community specs:
-  - it is recommended to declare to string constant (i.e. BUY_CAKE, use it for defining 'type' property
-*/
+const buyIcecreamAction = {
+  type: BUY_ICECREAM,
+  info: 'second redux action'
+}
 
 function buyCakeActionCreator() {
-  return bugCakeAction;
+  return buyCakeAction;
 }
-/*
-  action creator is a function returning action
 
-  1. what are the advantages of action creator ?
-     - incase any changes in the properties or addition of properties into action, it is simplfied to handle at one place i.e. action creator
-
-  conventions as per community specs:
-  - it is recommended to make use of action-creators to emit/dispatch actions.
-*/
+function buyIcecreamActionCreator() {
+  return buyIcecreamAction;
+}
 
 const initialState = {
-  numberOfCakes: 10  
+  numberOfCakes: 10,
+  numberOfIcecreams: 20
 };
-// initial state of the application
 
-const buyCakeReducer = (state = initialState, action) => {
+const buyReducer = (state = initialState, action) => {
   switch(action.type) {
     case BUY_CAKE:
       return {
         ...state,
         numberOfCakes: state.numberOfCakes - 1        
       }
+    case BUY_ICECREAM:
+      return {
+        ...state,
+        numberOfIcecreams: state.numberOfIcecreams - 1        
+      }
     default:
       return state
   }
 }
-/* 
 
-  - In reducer, current state object is never mutated, rather a new state object is created.
-
-*/
-
-
-const applicationStore = createStore(buyCakeReducer);
-/* 
-  one store per application
-
-  registers reducer, responsible for state transitions of the application
-  reads the initial state of the application through reducer
-*/
+const applicationStore = createStore(buyReducer);
 
 console.log('initial state of the application: ', applicationStore.getState());
-// getState is the API for retrieving the latest state of the application
 
 const listener = () => {
   console.log('update state of the application: ', applicationStore.getState());
 }
 const unsubscribe = applicationStore.subscribe(listener);
-/* 
-  subscription of listener to store. listener function will be executed upon any changes in the application's state.
-
-  unsubscribe is helpful to unsubscribe the listeners from store.
-*/
 
 applicationStore.dispatch(buyCakeActionCreator());
-/*
-  dispatching/emiting the action, which would be handled & addressed by concerned reducer buyCakeReducer.
-  buyCakeReducer would eventually change the state of the application & updates redux store.
-*/
 
 applicationStore.dispatch(buyCakeActionCreator());
-// dispatching/emiting the action for 2nd time
 
 applicationStore.dispatch(buyCakeActionCreator());
-// dispatching/emiting the action for 3rd time
+
+applicationStore.dispatch(buyIcecreamActionCreator());
+
+applicationStore.dispatch(buyIcecreamActionCreator());
+
+applicationStore.dispatch(buyIcecreamActionCreator());
 
 unsubscribe();
-// unsubscribing the listener from the store.
+
+/*
+
+Running the code, would give:
+
+initial state of the application:  { numberOfCakes: 10, numberOfIcecreams: 20 }
+update state of the application:  { numberOfCakes: 9, numberOfIcecreams: 20 }
+update state of the application:  { numberOfCakes: 8, numberOfIcecreams: 20 }
+update state of the application:  { numberOfCakes: 7, numberOfIcecreams: 20 }
+update state of the application:  { numberOfCakes: 7, numberOfIcecreams: 19 }
+update state of the application:  { numberOfCakes: 7, numberOfIcecreams: 18 }
+update state of the application:  { numberOfCakes: 7, numberOfIcecreams: 17 }
+
+*/
