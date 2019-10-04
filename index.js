@@ -1,6 +1,14 @@
 const redux = require('redux');
+const reduxLogger = require('redux-logger');
+
 const createStore = redux.createStore;
 const combineReducers = redux.combineReducers;
+
+const applyMiddleware = redux.applyMiddleware;
+// 1. required to register middleware to redux
+
+const reduxMiddlewareLogger = reduxLogger.createLogger();
+// 2. redux-logger middleware to register to redux
 
 const BUY_CAKE = 'BUY_CAKE';
 const BUY_ICECREAM = 'BUY_ICECREAM';
@@ -60,12 +68,14 @@ const rootReducer = combineReducers({
   iceCream: buyIcecreamReducer
 })
 
-const applicationStore = createStore(rootReducer);
+const applicationStore = createStore(rootReducer, applyMiddleware(reduxMiddlewareLogger));
+// 3. registering redux-logger middleware to redux
+//    - redux-logger functionality subscribes to store. Once store gets updated with state, redux-logger logs the previous state, latest state & an action responsible for updating the state.
 
 console.log('initial state of the application: ', applicationStore.getState());
 
 const listener = () => {
-  console.log('update state of the application: ', applicationStore.getState());
+  console.log('update state of the application------');
 }
 const unsubscribe = applicationStore.subscribe(listener);
 
@@ -82,21 +92,3 @@ applicationStore.dispatch(buyIcecreamActionCreator());
 applicationStore.dispatch(buyIcecreamActionCreator());
 
 unsubscribe();
-
-/*
-running the code:
-
-initial state of the application:  { cake: { numberOfCakes: 10 }, iceCream: { numberOfIcecreams: 20 } }
-update state of the application:  { cake: { numberOfCakes: 9 }, iceCream: { numberOfIcecreams: 20 } }
-update state of the application:  { cake: { numberOfCakes: 8 }, iceCream: { numberOfIcecreams: 20 } }
-update state of the application:  { cake: { numberOfCakes: 7 }, iceCream: { numberOfIcecreams: 20 } }
-update state of the application:  { cake: { numberOfCakes: 7 }, iceCream: { numberOfIcecreams: 19 } }
-update state of the application:  { cake: { numberOfCakes: 7 }, iceCream: { numberOfIcecreams: 18 } }
-update state of the application:  { cake: { numberOfCakes: 7 }, iceCream: { numberOfIcecreams: 17 } }
-
-- cake, iceCream describes global state objects
-- conventions for keys 'cake' & 'iceCream' is just as defined on combinedReducer.
-
-- Both reducers receives both actions cakeAction, iceCreamAction. Concerned reducer reacts to the action & other reducer ignores it.
-
-*/
