@@ -1,13 +1,16 @@
 const redux = require('redux');
-const reduxThunk = require('redux-thunk');
-// 1. redux-thunk required for handling asyn operations in redux environment
+const reduxSaga = require('redux-saga');
+// 1. redux-saga required for handling asyn operations in redux environment
+
+const { call, put, takeLatest } = require('redux-saga/effects');
 
 const axios = require('axios');
 
 const createStore = redux.createStore;
 const applyMiddleware = redux.applyMiddleware;
 
-const reduxThunkMiddleware = reduxThunk.default;
+const createSagaMiddleware = reduxSaga.default;
+const reduxSagaMiddleware = createSagaMiddleware();
 
 const initialState = {
   loading: true,
@@ -63,32 +66,37 @@ const reducer = (state = initialState, action) => {
   }
 };
 
-const fetchUsers = (dispatch) => {
-  dispatch(fetchUsersRequest());
-  axios
-    .get('https://jsonplaceholder.typicode.com/users')
-    .then((response) => {
-      const users = response.data.map((user) => user.name);
-      dispatch(fetchUsersSuccess(users));
-    })
-    .catch((error) => {
-      dispatch(fetchUsersFailure(error.message));
-    });
-  /*
-    4. As stated in step-3, with intension of dispatching of action to store, function reference is passed.
-      - redux-thunk holds the reference of 'dispatch'.
-      - redux-thunk executes that function passing 'dispatch' as argument.
-        - all the asyc operations goes into this function. Async operations could be side effects (fetching data from REST API), dispatching actions to store which rely on the results of side effects etc
-        - Since 'dispatch' reference is made available when invoking this function, multiple actions can be dispatched as asyn operations demands.
-  */
+const fetchUsersApi = () => {
+  return axios.get('https://jsonplaceholder.typicode.com/users')
 };
 
-const store = createStore(reducer, applyMiddleware(reduxThunkMiddleware));
-// 2. registering redux with redux-thunk middleware
+function* fetchUsers(action) {
+  try {
+    const result = yield call(fetchUsersApi);
+    const users = result.data.map((user) => user.name);
+    yield put({ type: FETCH_USERS_SUCCESS, payload: users });   
+  } catch(e) {
+    yield put({ type: FETCH_USERS_FAILURE, payload: e.message });
+  }
+};
+/*
+  5. All the asynchronous operations goes here.
+  - Further action dispatching the store is achieved using 'put' from redux-saga middleware.
+*/
+
+function* mySaga() {
+  yield takeLatest(FETCH_USERS_REQUEST, fetchUsers);
+}
+// 4. Upon dispatch of FETCH_USERS_REQUEST, saga middleware take care of running fetchUsers function passing FETCH_USERS_REQUEST action details as argument
+
+const store = createStore(reducer, applyMiddleware(reduxSagaMiddleware));
+// 2. mounting redux with redux-saga middleware
+
+reduxSagaMiddleware.run(mySaga);
+// 3. running a saga to keep polling for dispatching of specific action (in our example 'FETCH_USERS_REQUEST')
 
 store.subscribe(() => {
   console.log(store.getState());
 });
 
-store.dispatch(fetchUsers);
-// 3. with use of redux-thunk middleware, with the intension of dispatching action, rather passing action creator as argument, a function is passed
+store.dispatch(fetchUsersRequest());
