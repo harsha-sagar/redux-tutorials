@@ -67,13 +67,17 @@ const reducer = (state = initialState, action) => {
 };
 
 const fetchUsersApi = () => {
-  return axios.get('https://jsonplaceholder.typicode.com/users')
+  return axios.get('https://jsonplaceholder.typicode.com/users');
+  // axios is designed to return promise object
 };
 
 function* fetchUsers(action) {
   try {
     const result = yield call(fetchUsersApi);
+    // yield expects to return promise object.
+
     const users = result.data.map((user) => user.name);
+
     yield put({ type: FETCH_USERS_SUCCESS, payload: users });   
   } catch(e) {
     yield put({ type: FETCH_USERS_FAILURE, payload: e.message });
