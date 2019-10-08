@@ -2,6 +2,8 @@ const redux = require('redux');
 const createStore = redux.createStore;
 const combineReducers = redux.combineReducers;
 
+const { fromJS } = require('immutable');
+
 const BUY_CAKE = 'BUY_CAKE';
 const BUY_ICECREAM = 'BUY_ICECREAM';
 
@@ -23,21 +25,18 @@ function buyIcecreamActionCreator() {
   return buyIcecreamAction;
 }
 
-const initialCakesState = {
+const initialCakesState = fromJS({
   numberOfCakes: 10
-};
+});
 
-const initialIcecreamsState = {
+const initialIcecreamsState = fromJS({
   numberOfIcecreams: 20
-};
+});
 
 const buyCakeReducer = (state = initialCakesState, action) => {
   switch(action.type) {
     case BUY_CAKE:
-      return {
-        ...state,
-        numberOfCakes: state.numberOfCakes - 1        
-      }
+      return state.set('numberOfCakes', state.get('numberOfCakes') - 1);
     default:
       return state
   }
@@ -46,10 +45,7 @@ const buyCakeReducer = (state = initialCakesState, action) => {
 const buyIcecreamReducer = (state = initialIcecreamsState, action) => {
   switch(action.type) {
     case BUY_ICECREAM:
-      return {
-        ...state,
-        numberOfIcecreams: state.numberOfIcecreams - 1        
-      }
+      return state.set('numberOfIcecreams', state.get('numberOfIcecreams') - 1);
     default:
       return state
   }
@@ -82,21 +78,3 @@ applicationStore.dispatch(buyIcecreamActionCreator());
 applicationStore.dispatch(buyIcecreamActionCreator());
 
 unsubscribe();
-
-/*
-running the code:
-
-initial state of the application:  { cake: { numberOfCakes: 10 }, iceCream: { numberOfIcecreams: 20 } }
-update state of the application:  { cake: { numberOfCakes: 9 }, iceCream: { numberOfIcecreams: 20 } }
-update state of the application:  { cake: { numberOfCakes: 8 }, iceCream: { numberOfIcecreams: 20 } }
-update state of the application:  { cake: { numberOfCakes: 7 }, iceCream: { numberOfIcecreams: 20 } }
-update state of the application:  { cake: { numberOfCakes: 7 }, iceCream: { numberOfIcecreams: 19 } }
-update state of the application:  { cake: { numberOfCakes: 7 }, iceCream: { numberOfIcecreams: 18 } }
-update state of the application:  { cake: { numberOfCakes: 7 }, iceCream: { numberOfIcecreams: 17 } }
-
-- cake, iceCream describes global state objects
-- conventions for keys 'cake' & 'iceCream' is just as defined on combinedReducer.
-
-- Both reducers receives both actions cakeAction, iceCreamAction. Concerned reducer reacts to the action & other reducer ignores it.
-
-*/
