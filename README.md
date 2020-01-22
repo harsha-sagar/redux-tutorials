@@ -1,0 +1,2 @@
+- playing around concepts of redux state management library.
+- different branches corresponds to different concepts learnt & concerned examples.
